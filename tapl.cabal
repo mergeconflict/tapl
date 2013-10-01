@@ -1,0 +1,16 @@
+name:                tapl
+version:             0.1.0.0
+-- synopsis:            
+-- description:         
+homepage:            https://github.com/mergeconflict/tapl
+license:             Apache-2.0
+license-file:        LICENSE
+author:              Dan Rosen
+category:            Language
+build-type:          Simple
+cabal-version:       >=1.8
+
+library
+  exposed-modules:     Language.TAPL.Untyped
+  build-depends:       base ==4.6.*
+  hs-source-dirs:      src
