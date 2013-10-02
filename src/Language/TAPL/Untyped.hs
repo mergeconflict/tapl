@@ -5,29 +5,27 @@ data Term = Var Int
           | App Term Term
   deriving Eq
 
-newtype Context = Context [String]
-
 instance Show Term where
   show term =
-    let fresh c@(Context names) name
-          | name `elem` names = fresh c (name ++ "'")
-          | otherwise         = (Context $ name : names, name)
-        go (Context names) (Var index) =
+    let fresh names name
+          | name `elem` names = fresh names $ name ++ "'"
+          | otherwise         = (name : names, name)
+        go names (Var index) =
           names !! index
-        go context (Abs name body) =
-          let (context', name') = fresh context name
-          in "λ" ++ name' ++ "." ++ go context' body
-        go context (App lhs rhs) =
-          "(" ++ go context lhs ++ " " ++ go context rhs ++ ")"
-    in go (Context []) term
+        go names (Abs name body) =
+          let (names', name') = fresh names name
+          in "λ" ++ name' ++ "." ++ go names' body
+        go names (App lhs rhs) =
+          "(" ++ go names lhs ++ " " ++ go names rhs ++ ")"
+    in go [] term
 
 shift :: Int -> Term -> Term
 shift distance term =
   let go cutoff v@(Var index)
-        | index >= cutoff        = Var $ index + distance
-        | otherwise              = v
-      go cutoff (Abs name body)  = Abs name $ go (cutoff + 1) body
-      go cutoff (App lhs rhs)    = App (go cutoff lhs) (go cutoff rhs)
+        | index >= cutoff       = Var $ index + distance
+        | otherwise             = v
+      go cutoff (Abs name body) = Abs name $ go (cutoff + 1) body
+      go cutoff (App lhs rhs)   = App (go cutoff lhs) (go cutoff rhs)
   in go 0 term
 
 subst :: Int -> Term -> Term -> Term
